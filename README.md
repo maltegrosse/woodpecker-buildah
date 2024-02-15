@@ -3,6 +3,24 @@ A basic wrapper for buildah commands to run as a woodpecker-ci pipeline.
 
 Inspired by https://codeberg.org/Taywee/woodpecker-buildah/ , rewritten in golang.
 
+## Usage
+```
+steps:
+  build_and_release_and_push:
+    image: maltegrosse/woodpecker-buildah:0.0.8
+    pull: true
+    settings:
+      registry: somehub.com
+      repository: theuser/mytarget_repo
+      tag: 4.0.12c
+      architectures: amd64 aarch64
+      context: Dockerfile
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+```
+
 ## Links
 A collection of useful buildah articles
 - https://codeberg.org/Taywee/woodpecker-buildah/

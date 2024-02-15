@@ -19,7 +19,6 @@ type options struct {
 	Password      string
 	Registry      string
 	Repository    string
-	ImageName     string
 	Tag           string
 	Context       string
 	ManifestName  string
@@ -57,7 +56,6 @@ func readEnv() (*options,error){
 	viper.BindEnv("password")
 	viper.BindEnv("registry")
 	viper.BindEnv("repository")
-	viper.BindEnv("imagename")
 	viper.SetDefault("tag", "latest")
 	viper.BindEnv("tag")
 	viper.SetDefault("context", "Dockerfile")
@@ -150,7 +148,7 @@ func createManifest(opts *options) error{
 func buildArchs(opts *options)error{
 	
 	path := opts.CurrentPath +"/"+ opts.Context 
-	tag := opts.Registry+"/"+opts.Repository+"/"+opts.ImageName+":"+opts.Tag
+	tag := opts.Registry+"/"+opts.Repository+":"+opts.Tag
 	for _, arch := range opts.Architectures {
 		log.Println("INFO: building for architecture", arch)
 		args:= []string{"build", "--manifest", opts.ManifestName, "--arch",arch,"--tag",tag,"--log-level",opts.LogLevel}
@@ -168,7 +166,7 @@ func buildArchs(opts *options)error{
 	return nil
 }
 func push(opts *options) error{
-	path := opts.Transport+ "://"+ opts.Registry+"/"+opts.Repository+"/"+opts.ImageName+":"+opts.Tag
+	path := opts.Transport+ "://"+ opts.Registry+"/"+opts.Repository+":"+opts.Tag
 	args:= []string{"manifest", "push","--all","--log-level",opts.LogLevel, opts.ManifestName, path}
 	args = append(args, opts.Flags...)
 	args = append(args, opts.PushArgs...)

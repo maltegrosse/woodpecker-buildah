@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
+
 	"github.com/spf13/viper"
 )
 
@@ -114,21 +116,12 @@ func login(opts *options) error{
 	if len(opts.Registry) == 0 {
 		return errors.New("registry is required")
 	}
-	args := []string{"login", "--username", opts.Username, "--password-stdin",opts.Registry}
-	args = append(args, opts.Flags...)
-	args = append(args, opts.LoginArgs...)
-	stdin, err := exec.Command(buildahPath,args...).StdinPipe()
+
+	cmd := exec.Command(buildahPath,"login", "--username", opts.Username, "--password-stdin",opts.Registry)
+	cmd.Stdin = bytes.NewBufferString(opts.Password)
+	err := cmd.Run()
 	if err != nil {
-		return errors.New("failed login: " + err.Error())
-	}
-	_, err = fmt.Fprintf(stdin, opts.Password)
-	if err != nil {
-		return errors.New("failed login: " + err.Error())
-	}
-	stdin.Close()
-	out, err := exec.Command(buildahPath,"login", "--username", opts.Username, "--password-stdin",opts.Registry).Output()
-	if err != nil {
-		return fmt.Errorf("login failed: %s\n%s", err, out)
+		return fmt.Errorf("login failed: %s", err)
 	}
 	log.Println("INFO: login success at registry", opts.Registry)
 	return nil

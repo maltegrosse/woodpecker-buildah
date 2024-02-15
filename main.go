@@ -32,7 +32,7 @@ type options struct {
 	BuildArgs []string
 	PushArgs []string
 	Steps []string
-	BuildPath string
+
 	CurrentPath string
 }
 
@@ -74,7 +74,7 @@ func readEnv() (*options,error){
 	viper.BindEnv("pushargs")
 	viper.SetDefault("steps", []string{"login","build","push"})
 	viper.BindEnv("steps")
-	viper.BindEnv("buildpath")
+
 	var opts options
 	err := viper.Unmarshal(&opts)
 	if err != nil {
@@ -147,7 +147,7 @@ func createManifest(opts *options) error{
 }
 func buildArchs(opts *options)error{
 	
-	path := opts.CurrentPath + opts.BuildPath
+	path := opts.CurrentPath + opts.Context 
 	tag := opts.Registry+"/"+opts.Repository+"/"+opts.ImageName+":"+opts.Tag
 	for _, arch := range opts.Architectures {
 		fmt.Println("INFO: building for architecture", arch)

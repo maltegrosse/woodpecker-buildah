@@ -32,6 +32,8 @@ type options struct {
 	BuildArgs []string
 	PushArgs []string
 	Steps []string
+	BuildPath string
+	CurrentPath string
 }
 
 func main() {
@@ -72,11 +74,13 @@ func readEnv() (*options,error){
 	viper.BindEnv("pushargs")
 	viper.SetDefault("steps", []string{"login","build","push"})
 	viper.BindEnv("steps")
+	viper.BindEnv("buildpath")
 	var opts options
 	err := viper.Unmarshal(&opts)
 	if err != nil {
 		return nil, err
 	}
+	opts.CurrentPath = os.Getenv("CI_WORKSPACE")
 	return &opts, nil
 }
 func execute(opts *options) error {
@@ -130,6 +134,7 @@ func createManifest(opts *options) error{
 	if len(opts.ManifestName) == 0 {
 		opts.ManifestName = os.Getenv("CI_COMMIT_SHA")
 	}
+	
 	args := []string{"manifest", "create", opts.ManifestName}
 	args = append(args, opts.Flags...)
 	args = append(args, opts.ManifestArgs...)
@@ -141,12 +146,15 @@ func createManifest(opts *options) error{
 	return nil
 }
 func buildArchs(opts *options)error{
+	
+	path := opts.CurrentPath + opts.BuildPath
 	tag := opts.Registry+"/"+opts.Repository+"/"+opts.ImageName+":"+opts.Tag
 	for _, arch := range opts.Architectures {
 		fmt.Println("INFO: building for architecture", arch)
 		args:= []string{"build", "--manifest", opts.ManifestName, "--arch",arch,"--tag",tag}
 		args = append(args, opts.Flags...)
 		args = append(args, opts.BuildArgs...)
+		args = append(args, path)
 		out, err := exec.Command(buildahPath,args...).Output()
 		if err != nil {
 			return fmt.Errorf("building arch %s failed: %s\n%s", arch,err, out)

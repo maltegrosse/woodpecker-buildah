@@ -20,6 +20,10 @@ steps:
       password:
         from_secret: docker_password
 ```
+## Limitation
+Plugin in early stage. Only tested with kubernetes backend. Currently only working in privileged mode. Fuse package is preinstalled, and fuse storage could be added as a flag.
+
+As it runs privileged only, woodpecker need to trust the container repo. See https://woodpecker-ci.org/docs/administration/server-config#all-server-configuration-options --> WOODPECKER_ESCALATE
 
 ## Links
 A collection of useful buildah articles
@@ -31,11 +35,6 @@ A collection of useful buildah articles
 - https://github.com/containers/buildah/blob/main/docs/buildah.1.md
 - https://insujang.github.io/2020-11-09/building-container-image-inside-container-using-buildah/
 - https://danmanners.com/posts/2022-01-buildah-multi-arch/
-
-
-flags 
-- storage driver + other flags
-- build containe + buildah (fuse + qemu other package)
 
 
 ## License

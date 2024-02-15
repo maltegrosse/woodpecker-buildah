@@ -147,7 +147,7 @@ func createManifest(opts *options) error{
 }
 func buildArchs(opts *options)error{
 	
-	path := opts.CurrentPath + opts.Context 
+	path := opts.CurrentPath +"/"+ opts.Context 
 	tag := opts.Registry+"/"+opts.Repository+"/"+opts.ImageName+":"+opts.Tag
 	for _, arch := range opts.Architectures {
 		fmt.Println("INFO: building for architecture", arch)

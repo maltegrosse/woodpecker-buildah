@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-
 	"github.com/spf13/viper"
 )
 
@@ -32,6 +31,7 @@ type options struct {
 	BuildArgs []string
 	PushArgs []string
 	Steps []string
+	LogLevel string
 
 	CurrentPath string
 }
@@ -72,9 +72,10 @@ func readEnv() (*options,error){
 	viper.BindEnv("manifestargs")
 	viper.BindEnv("buildargs")
 	viper.BindEnv("pushargs")
-	viper.SetDefault("steps", []string{"login","build","push"})
+	viper.SetDefault("steps", []string{"login","manifest","build","push"})
 	viper.BindEnv("steps")
-
+	viper.SetDefault("loglevel", "info") // debug, info, warn, error
+	viper.BindEnv("loglevel")
 	var opts options
 	err := viper.Unmarshal(&opts)
 	if err != nil {
@@ -92,13 +93,14 @@ func execute(opts *options) error {
 				return err	
 
 			}
-		case "build":
+		case "manifest":
 			err := createManifest(opts)
 			if err != nil {
 				return err	
 
-			}
-			err = buildArchs(opts)
+			}	
+		case "build":
+			err := buildArchs(opts)
 			if err != nil {
 				return err	
 
@@ -125,7 +127,7 @@ func login(opts *options) error{
 	cmd.Stdin = bytes.NewBufferString(opts.Password)
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("login failed: %s", err)
+		return fmt.Errorf("login failed: %s", err.Error())
 	}
 	log.Println("INFO: login success at registry", opts.Registry)
 	return nil
@@ -135,12 +137,12 @@ func createManifest(opts *options) error{
 		opts.ManifestName = os.Getenv("CI_COMMIT_SHA")
 	}
 	
-	args := []string{"manifest", "create", opts.ManifestName}
+	args := []string{"manifest", "create", opts.ManifestName,"--log-level",opts.LogLevel}
 	args = append(args, opts.Flags...)
 	args = append(args, opts.ManifestArgs...)
-	out, err := exec.Command(buildahPath,args...).Output()
+	out, err := exec.Command(buildahPath,args...).CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("creating manifest failed: %s\n%s", err, out)
+		return fmt.Errorf("creating manifest failed: %s\n%s", err.Error(), out)
 	}
 	log.Println("INFO: created manifest", opts.ManifestName)
 	return nil
@@ -150,14 +152,15 @@ func buildArchs(opts *options)error{
 	path := opts.CurrentPath +"/"+ opts.Context 
 	tag := opts.Registry+"/"+opts.Repository+"/"+opts.ImageName+":"+opts.Tag
 	for _, arch := range opts.Architectures {
-		fmt.Println("INFO: building for architecture", arch)
-		args:= []string{"build", "--manifest", opts.ManifestName, "--arch",arch,"--tag",tag}
+		log.Println("INFO: building for architecture", arch)
+		args:= []string{"build", "--manifest", opts.ManifestName, "--arch",arch,"--tag",tag,"--log-level",opts.LogLevel}
 		args = append(args, opts.Flags...)
 		args = append(args, opts.BuildArgs...)
 		args = append(args, path)
-		out, err := exec.Command(buildahPath,args...).Output()
+		log.Println("INFO: building with args", args)
+		output, err:= exec.Command(buildahPath,args...).CombinedOutput()
 		if err != nil {
-			return fmt.Errorf("building arch %s failed: %s\n%s", arch,err, out)
+			return fmt.Errorf("building arch %s failed: %s\n%s", arch,err.Error(), output)
 		}
 		log.Println("INFO: build successfull for architecture", arch)
 	}
@@ -166,12 +169,12 @@ func buildArchs(opts *options)error{
 }
 func push(opts *options) error{
 	path := opts.Transport+ "://"+ opts.Registry+"/"+opts.Repository+"/"+opts.ImageName+":"+opts.Tag
-	args:= []string{"manifest", "push","--all", opts.ManifestName, path}
+	args:= []string{"manifest", "push","--all","--log-level",opts.LogLevel, opts.ManifestName, path}
 	args = append(args, opts.Flags...)
 	args = append(args, opts.PushArgs...)
-	out, err := exec.Command(buildahPath,args...).Output()
+	out, err := exec.Command(buildahPath,args...).CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("pushing image failed: %s\n%s", err, out)
+		return fmt.Errorf("pushing image failed: %s\n%s", err.Error(), out)
 	}
 	log.Println("INFO: pushed successfully to", path)
 	return nil

@@ -17,7 +17,7 @@ RUN set -xeuf; \
   echo -e "build:1:999\nbuild:1001:64535" > /etc/subgid; \
   :
 
-COPY --from=build --chmod=755 /wrapper /usr/local/bin/wrapper
+COPY --from=builder --chmod=755 /wrapper /usr/local/bin/wrapper
 
 COPY storage.conf containers.conf /etc/containers/
 

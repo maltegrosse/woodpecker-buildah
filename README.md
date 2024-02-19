@@ -3,11 +3,16 @@ A basic wrapper for buildah commands to run as a woodpecker-ci pipeline.
 
 Inspired by https://codeberg.org/Taywee/woodpecker-buildah/ , rewritten in golang.
 
+Latest container can be found here:
+
+https://hub.docker.com/r/maltegrosse/woodpecker-buildah/tags
+
+
 ## Usage
 ```
 steps:
   build_and_release_and_push:
-    image: maltegrosse/woodpecker-buildah:0.0.8
+    image: maltegrosse/woodpecker-buildah:0.0.11
     pull: true
     settings:
       registry: somehub.com
@@ -21,7 +26,7 @@ steps:
         from_secret: docker_password
 ```
 ## Limitation
-The plugin runs with vfs - and is quite slow... see links for further information.
+There are certain considerations between security and performance, especially running on Kubernetes. Currently, the plugin runs with vfs - and it is quite slow... see links for further information.
 
 Plugin in early stage. Only tested with kubernetes backend. To run multi-arch builds, a second qemu container needs to be deployed (in privileged mode) --> see example-qemu.yaml
 

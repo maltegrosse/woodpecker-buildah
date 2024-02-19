@@ -21,9 +21,13 @@ steps:
         from_secret: docker_password
 ```
 ## Limitation
-Plugin in early stage. Only tested with kubernetes backend. Currently only working in privileged mode. Fuse package is preinstalled, and fuse storage could be added as a flag.
+The plugin runs with vfs - and is quite slow... see links for further information.
 
-As it runs privileged only, woodpecker need to trust the container repo. See https://woodpecker-ci.org/docs/administration/server-config#all-server-configuration-options --> WOODPECKER_ESCALATE
+Plugin in early stage. Only tested with kubernetes backend. To run multi-arch builds, a second qemu container needs to be deployed (in privileged mode) --> see example-qemu.yaml
+
+Fuse package is preinstalled, and fuse storage could be added as a flag. (untested)
+
+If buildah runs in privileged mode, woodpecker needs to trust the container repo. See https://woodpecker-ci.org/docs/administration/server-config#all-server-configuration-options --> WOODPECKER_ESCALATE
 
 ## Links
 A collection of useful buildah articles

@@ -28,7 +28,7 @@ steps:
 ## Limitation
 There are certain considerations between security and performance, especially running on Kubernetes. Currently, the plugin runs with vfs - and it is quite slow... see links for further information.
 
-Plugin in early stage. Only tested with kubernetes backend. To run multi-arch builds, a second qemu container needs to be deployed (in privileged mode) --> see example-qemu.yaml
+Plugin is in early stage and only tested with Woodpecker Kubernetes backend. To run multi-arch builds, a second qemu container needs to be deployed (in privileged mode) --> see example-qemu.yaml (as one possible solution)
 
 Fuse package is preinstalled, and fuse storage could be added as a flag. (untested)
 

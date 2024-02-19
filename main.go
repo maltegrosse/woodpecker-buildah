@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -154,7 +155,9 @@ func buildArchs(opts *options)error{
 	path := opts.CurrentPath +"/"+ opts.Context 
 	tag := opts.Registry+"/"+opts.Repository+":"+opts.Tag
 	for _, arch := range opts.Architectures {
+		
 		log.Println("INFO: building for architecture", arch)
+		start := time.Now()
 		args:= []string{"build", "--manifest", opts.ManifestName, "--arch",arch,"--tag",tag,"--log-level",opts.LogLevel}
 		args = append(args, opts.Flags...)
 		args = append(args, opts.BuildArgs...)
@@ -168,7 +171,7 @@ func buildArchs(opts *options)error{
 		if err != nil {
 			return fmt.Errorf("building arch %s failed: %s\n%s", arch,err.Error(), output)
 		}
-		log.Println("INFO: build successfull for architecture", arch)
+		log.Println("INFO: build successfull for architecture", arch, "in",time.Since(start).Minutes(),"minutes")
 	}
 	log.Println("INFO: build successfull finished for tag", tag)
 	return nil

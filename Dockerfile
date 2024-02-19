@@ -11,7 +11,7 @@ FROM docker.io/alpine:latest AS run
 LABEL "io.containers.capabilities"="CHOWN,DAC_OVERRIDE,FOWNER,FSETID,KILL,NET_BIND_SERVICE,SETFCAP,SETGID,SETPCAP,SETUID,SYS_CHROOT"
 
 RUN set -xeuf; \
-  apk add --no-cache buildah fuse-overlayfs qemu; \
+  apk add --no-cache buildah fuse-overlayfs qemu qemu-x86_64 qemu-aarch64 qemu-arm; \
   adduser -D build; \
   echo -e "build:1:999\nbuild:1001:64535" > /etc/subuid; \
   echo -e "build:1:999\nbuild:1001:64535" > /etc/subgid; \

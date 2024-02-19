@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: multiarch-qemu
+  namespace: woodpecker
+spec:
+  selector:
+    matchLabels:
+      name: multiarch-qemu
+  template:
+    metadata:
+      labels:
+        name: multiarch-qemu
+    spec:
+      nodeSelector:
+        type: worker
+      containers:
+      - name: multiarch-qemu
+        image: docker.io/multiarch/qemu-user-static:7.2.0-1
+        resources:
+          limits:
+            nvidia.com/mig-2g.20gb: 0
+        command:
+        - /bin/sh
+        - -c
+        - /register --reset --persistent yes && while :; do sleep 3600; done
+
+        securityContext:
+          privileged: true

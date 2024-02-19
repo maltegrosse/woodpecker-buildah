@@ -7,6 +7,9 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
+	"strings"
+
 	"github.com/spf13/viper"
 )
 
@@ -36,6 +39,7 @@ type options struct {
 }
 
 func main() {
+	
 	log.Println("INFO: starting buildah plugin")
 	opts, err := readEnv()
 	if err != nil {
@@ -154,6 +158,10 @@ func buildArchs(opts *options)error{
 		args:= []string{"build", "--manifest", opts.ManifestName, "--arch",arch,"--tag",tag,"--log-level",opts.LogLevel}
 		args = append(args, opts.Flags...)
 		args = append(args, opts.BuildArgs...)
+		if !strings.Contains(runtime.GOARCH,arch){
+			log.Println("INFO: QEMU for", arch)
+			opts.BuildArgs = append(opts.BuildArgs, "-f")
+		}
 		args = append(args, path)
 		log.Println("INFO: building with args", args)
 		output, err:= exec.Command(buildahPath,args...).CombinedOutput()

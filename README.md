@@ -35,6 +35,8 @@ A collection of useful buildah articles
 - https://github.com/containers/buildah/blob/main/docs/buildah.1.md
 - https://insujang.github.io/2020-11-09/building-container-image-inside-container-using-buildah/
 - https://danmanners.com/posts/2022-01-buildah-multi-arch/
+- https://www.itix.fr/blog/build-multi-architecture-container-images-with-kubernetes-buildah-tekton-and-qemu/
+- https://developers.redhat.com/blog/2019/08/14/best-practices-for-running-buildah-in-a-container#running_buildah_inside_a_container
 
 
 ## License

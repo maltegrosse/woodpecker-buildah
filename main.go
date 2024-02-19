@@ -160,7 +160,7 @@ func buildArchs(opts *options)error{
 		args = append(args, opts.BuildArgs...)
 		if !strings.Contains(runtime.GOARCH,arch){
 			log.Println("INFO: QEMU for", arch)
-			opts.BuildArgs = append(opts.BuildArgs, "-f")
+			args = append(args, "-f")
 		}
 		args = append(args, path)
 		log.Println("INFO: building with args", args)
